@@ -75,6 +75,8 @@ GeoScope adds a location and movement layer to the diagnostic tool family.
 | **Active Buzzer** | Alerts for waypoint save, arrival, GPS fix, SD error, and low battery |
 | **Power Circuit** | Portable battery-powered operation |
 
+![Alt text](20251119_133702.jpg)
+
 ---
 
 ## Display Roles
