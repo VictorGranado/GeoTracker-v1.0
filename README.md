@@ -1,14 +1,14 @@
-# GeoScope v1.0 — Portable GPS Field Survey and Mapping Tool
+# GeoTracker v1.0 — Portable GPS Field Survey and Mapping Tool
 
-GeoScope v1.0 is a portable embedded field-survey instrument built around an ESP32-WROOM-DA. The device records GPS position, trip movement, waypoints, environmental conditions, compass heading, tilt/orientation data, and system status. The goal is to create a handheld tool that can collect **location-tagged field data** and provide basic navigation features without relying on a phone or internet connection.
+GeoTracker v1.0 is a portable embedded field-survey instrument built around an ESP32-WROOM-DA. The device records GPS position, trip movement, waypoints, environmental conditions, compass heading, tilt/orientation data, and system status. The goal is to create a handheld tool that can collect **location-tagged field data** and provide basic navigation features without relying on a phone or internet connection.
 
-Unlike a simple environmental monitor or signal scanner, GeoScope focuses on adding the missing context of **where** the data was collected.
+Unlike a simple environmental monitor or signal scanner, GeoTracker focuses on adding the missing context of **where** the data was collected.
 
 ---
 
 ## Project Purpose
 
-GeoScope is designed to answer questions such as:
+GeoTracker is designed to answer questions such as:
 
 - Where am I?
 - Where have I been?
@@ -24,15 +24,15 @@ The device is intended for outdoor testing, field experiments, mapping, trail lo
 
 ## Project Line Context
 
-GeoScope is part of a broader line of embedded diagnostic tools:
+GeoTracker is part of a broader line of embedded diagnostic tools:
 
 | Project | Main Focus |
 |---|---|
 | **MSER v2.0** | Environmental sensing and data monitoring |
 | **Signal Scanner** | Wireless, RF, EMF and electrical signal diagnostics |
-| **GeoScope v1.0** | GPS-based field surveying, mapping, and navigation |
+| **GeoTracker v1.0** | GPS-based field surveying, mapping, and navigation |
 
-GeoScope adds a location and movement layer to the diagnostic tool family.
+GeoTracker adds a location and movement layer to the diagnostic tool family.
 
 ---
 
@@ -75,13 +75,13 @@ GeoScope adds a location and movement layer to the diagnostic tool family.
 | **Active Buzzer** | Alerts for waypoint save, arrival, GPS fix, SD error, and low battery |
 | **Power Circuit** | Portable battery-powered operation |
 
-![Alt text](https://github.com/VictorGranado/GeoScope-v1.0/blob/92e80e2c3bc338a8f77a025eeff407417906f5b6/Wiring%20Diagram)
+![Alt text](https://github.com/VictorGranado/GeoTracker-v1.0/blob/92e80e2c3bc338a8f77a025eeff407417906f5b6/Wiring%20Diagram)
 
 ---
 
 ## Display Roles
 
-GeoScope uses one main display and two support displays.
+GeoTracker uses one main display and two support displays.
 
 | Display | Role |
 |---|---|
@@ -113,7 +113,7 @@ Shown values:
 Example display concept:
 
 ```text
-GEOSCOPE GPS
+GeoTracker GPS
 Fix: 3D   Sat: 12
 Lat: 43.826100
 Lon:-111.789700
@@ -142,7 +142,7 @@ Example concept:
 
 ```text
 +--------------------------+
-| GEOSCOPE MAP   Fix: 3D   |
+| GeoTracker MAP   Fix: 3D   |
 |                          |
 |      WPT2                |
 |       *                  |
@@ -207,7 +207,7 @@ This mode works like a field GPS compass rather than road navigation. It gives d
 
 ### 5. Return to Start
 
-When a trip begins, GeoScope stores the starting GPS coordinate.
+When a trip begins, GeoTracker stores the starting GPS coordinate.
 
 Return-to-start mode guides the user back to the starting point using:
 
@@ -314,7 +314,7 @@ This allows the main TFT screen to remain focused on the active mode while GPS s
 
 ## Button Controls
 
-GeoScope uses three push buttons.
+GeoTracker uses three push buttons.
 
 | Button | Short Press | Long Press |
 |---|---|---|
@@ -399,7 +399,7 @@ The MPU-6050 does not replace the magnetometer because it does not detect magnet
 
 ### Distance to Target
 
-For accurate GPS distance calculations, GeoScope can use the Haversine formula.
+For accurate GPS distance calculations, GeoTracker can use the Haversine formula.
 
 ```cpp
 double distanceMeters(double lat1, double lon1, double lat2, double lon2) {
@@ -501,7 +501,7 @@ The first version should use a simple trail map instead of full offline street m
 
 ## Data Logging
 
-GeoScope logs data to a MicroSD card using CSV files. CSV is easy to open in Excel, Google Sheets, Python, MATLAB, or mapping tools.
+GeoTracker logs data to a MicroSD card using CSV files. CSV is easy to open in Excel, Google Sheets, Python, MATLAB, or mapping tools.
 
 ### Main Trip Log
 
@@ -641,7 +641,7 @@ Possible I2C address examples:
 
 ## Power Notes
 
-GeoScope is designed to be portable, so power stability is important.
+GeoTracker is designed to be portable, so power stability is important.
 
 Recommended power considerations:
 
@@ -750,7 +750,7 @@ Recommended power considerations:
 
 ## Future Improvements
 
-Possible GeoScope v1.1 or v2.0 upgrades:
+Possible GeoTracker v1.1 or v2.0 upgrades:
 
 - GPX export
 - KML export for Google Earth
