@@ -29,14 +29,11 @@ The v1.0 build has completed:
 - Tracking start/stop
 - Return-to-start/navigation logic foundation
 
-GeoTracker v1.0 should now be treated as the completed hardware/firmware release. **GeoTracker Studio should be treated as the ready companion software layer for this project**, not just a distant future idea.
 
 The project now has two complementary parts:
 
 1. **GeoTracker v1.0** — the completed handheld embedded field-data acquisition device.  
 2. **GeoTracker Studio** — the Python desktop visualization and analysis companion for importing SD card logs, viewing 2D/3D routes, analyzing sensor data, and preparing exports.
-
-Future work can continue in two directions: firmware/hardware refinement through **GeoTracker v1.1/v2.0**, and visualization/analysis refinement through **GeoTracker Studio**.
 
 ---
 
@@ -113,7 +110,6 @@ GeoTracker adds a location and movement layer to the diagnostic tool family.
 | **BMM150 Magnetometer** | Compass heading and navigation direction support |
 | **MPU-6050** | Pitch, roll, acceleration, gyro, and movement/orientation data |
 | **NULLLAB I2C Numberpad/Keypad** | Menu navigation, waypoint actions, and latitude/longitude input |
-| **Active Buzzer** | Alerts and feedback foundation |
 | **Power Circuit** | Portable battery-powered operation |
 
 ---
@@ -829,39 +825,6 @@ Possible GeoTracker v1.1/v2.0 upgrades:
 - Learn embedded navigation, sensor integration, and data logging
 - Import captured SD logs into GeoTracker Studio for 2D/3D visualization and analysis
 
----
-
-## Repository Structure
-
-Suggested repository organization:
-
-```text
-GeoTracker-v1.0/
-├── firmware/
-│   └── GeoTracker_V1_Release.ino
-│
-├── tests/
-│   ├── GeoTracker_display_test.ino
-│   ├── GeoTracker_GPS_test.ino
-│   ├── GeoTracker_BME280_test.ino
-│   ├── GeoTracker_BMM150_test.ino
-│   ├── GeoTracker_MPU6050_test.ino
-│   ├── GeoTracker_SD_logging_test.ino
-│   └── GeoTracker_numberpad_test.ino
-│
-├── docs/
-│   ├── wiring_diagram.png
-│   ├── final_build_photos/
-│   └── sd_output_examples/
-│
-├── geotracker_studio/
-│   ├── src/
-│   ├── example_data/
-│   ├── exports/
-│   └── README.md
-│
-└── README.md
-```
 
 ---
 
