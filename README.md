@@ -4,6 +4,11 @@ GeoTracker v1.0 is a finished handheld embedded field-survey instrument built ar
 
 The goal of GeoTracker is to collect **location-tagged field data**: not just sensor readings, but sensor readings tied to **where**, **when**, and **under what movement/orientation conditions** the data was collected.
 
+The project now has two complementary parts:
+
+1. **GeoTracker v1.0** — the completed handheld embedded field-data acquisition device.  
+2. **GeoTracker Studio** — the Python desktop visualization and analysis companion for importing SD card logs, viewing 2D/3D routes, analyzing sensor data, and preparing exports.
+
 Unlike a simple environmental monitor or wireless scanner, GeoTracker focuses on adding the missing spatial layer: **where the data was collected and how the device moved through that space**.
 
 ---
@@ -28,12 +33,6 @@ The v1.0 build has completed:
 - Waypoint saving
 - Tracking start/stop
 - Return-to-start/navigation logic foundation
-
-
-The project now has two complementary parts:
-
-1. **GeoTracker v1.0** — the completed handheld embedded field-data acquisition device.  
-2. **GeoTracker Studio** — the Python desktop visualization and analysis companion for importing SD card logs, viewing 2D/3D routes, analyzing sensor data, and preparing exports.
 
 ---
 
