@@ -1,8 +1,42 @@
 # GeoTracker v1.0 — Portable GPS Field Survey and Mapping Tool
 
-GeoTracker v1.0 is a portable embedded field-survey instrument built around an ESP32-WROOM-DA. The device records GPS position, trip movement, waypoints, environmental conditions, compass heading, tilt/orientation data, and system status. The goal is to create a handheld tool that can collect **location-tagged field data** and provide basic navigation features without relying on a phone or internet connection.
+GeoTracker v1.0 is a finished handheld embedded field-survey instrument built around an ESP32-WROOM-DA. It records GPS position, trip movement, waypoints, environmental conditions, compass heading, orientation data, and system status to a MicroSD card.
 
-Unlike a simple environmental monitor or signal scanner, GeoTracker focuses on adding the missing context of **where** the data was collected.
+The goal of GeoTracker is to collect **location-tagged field data**: not just sensor readings, but sensor readings tied to **where**, **when**, and **under what movement/orientation conditions** the data was collected.
+
+Unlike a simple environmental monitor or wireless scanner, GeoTracker focuses on adding the missing spatial layer: **where the data was collected and how the device moved through that space**.
+
+---
+
+## Final Build Status
+
+**Status: Completed — GeoTracker v1.0 final hardware build**
+
+The v1.0 build has completed:
+
+- Hardware integration
+- Wiring and assembly
+- Multi-display UI
+- GPS acquisition
+- Compass/navigation display
+- GPS status display
+- BME280 environmental sensing
+- MPU-6050 motion/orientation sensing
+- BMM150 compass heading
+- MicroSD CSV logging
+- Keypad-based navigation and coordinate input
+- Waypoint saving
+- Tracking start/stop
+- Return-to-start/navigation logic foundation
+
+GeoTracker v1.0 should now be treated as the completed hardware/firmware release. **GeoTracker Studio should be treated as the ready companion software layer for this project**, not just a distant future idea.
+
+The project now has two complementary parts:
+
+1. **GeoTracker v1.0** — the completed handheld embedded field-data acquisition device.  
+2. **GeoTracker Studio** — the Python desktop visualization and analysis companion for importing SD card logs, viewing 2D/3D routes, analyzing sensor data, and preparing exports.
+
+Future work can continue in two directions: firmware/hardware refinement through **GeoTracker v1.1/v2.0**, and visualization/analysis refinement through **GeoTracker Studio**.
 
 ---
 
@@ -14,11 +48,12 @@ GeoTracker is designed to answer questions such as:
 - Where have I been?
 - How far have I traveled?
 - What direction is my target waypoint?
+- Can I save a field point and navigate back to it?
 - What were the local environmental conditions at this location?
-- How does altitude, temperature, humidity, pressure, or movement change across a path?
-- Can I save field points and navigate back to them?
+- How did altitude, temperature, humidity, pressure, heading, or movement change along a path?
+- Can I import the collected data into GeoTracker Studio for 2D/3D visualization and analysis?
 
-The device is intended for outdoor testing, field experiments, mapping, trail logging, environmental surveys, and embedded systems learning.
+The device is intended for outdoor testing, field experiments, mapping, trail logging, environmental surveys, embedded systems learning, and GPS/sensor visualization workflows through GeoTracker Studio.
 
 ---
 
@@ -29,8 +64,8 @@ GeoTracker is part of a broader line of embedded diagnostic tools:
 | Project | Main Focus |
 |---|---|
 | **MSER v2.0** | Environmental sensing and data monitoring |
-| **Signal Scanner** | Wireless, RF, EMF and electrical signal diagnostics |
-| **GeoTracker v1.0** | GPS-based field surveying, mapping, and navigation |
+| **Signal Scanner** | Wireless, RF, EMF, and electrical signal diagnostics |
+| **GeoTracker v1.0** | GPS-based field surveying, mapping, path tracking, and navigation |
 
 GeoTracker adds a location and movement layer to the diagnostic tool family.
 
@@ -39,290 +74,436 @@ GeoTracker adds a location and movement layer to the diagnostic tool family.
 ## Core Features
 
 - Live GPS dashboard
-- Live trail/path map on TFT display
+- GPS fix, satellite count, HDOP, altitude, speed, and UTC time display
+- Persistent compass/navigation OLED display
+- Persistent GPS status OLED display with satellite animation
+- TFT home screen with side menu
+- Path tracking menu
+- Start/stop CSV tracking
 - Waypoint marking
-- Navigate-to-waypoint mode
-- Return-to-start mode
-- Trip recorder
+- Manual coordinate input using keypad
+- Navigate-to-coordinate mode
+- Navigate-to-waypoint mode foundation
+- Return-to-start mode foundation
 - Distance traveled calculation
 - GPS speed and altitude display
-- Satellite/fix status display
-- Compass heading using magnetometer
-- Tilt/orientation display using MPU-6050
 - Environmental readings using BME280
 - Pressure altitude estimate
-- CSV logging to MicroSD card
-- Buzzer alerts for events
-- Portable battery-powered operation
-- Three-button menu navigation
+- Compass heading using BMM150 magnetometer
+- Pitch/roll and motion data using MPU-6050
+- MicroSD CSV logging
+- Event logging
+- Device status logging
+- Portable assembled handheld form factor
+- SD output designed for GeoTracker Studio import and visualization
 
 ---
 
-## Locked Hardware Scope
+## Final Hardware Scope
 
 | Component | Purpose |
 |---|---|
 | **ESP32-WROOM-DA Dev Board** | Main microcontroller |
-| **NEO-M8N GPS Module** | Latitude, longitude, GPS altitude, speed, time, course, satellite data |
-| **2.4 inch SPI TFT Display** | Main interface, menus, maps, trip data, navigation screens |
-| **0.96 inch I2C OLED Display #1** | Compass and tilt/orientation display |
-| **0.96 inch I2C OLED Display #2** | GPS satellite and fix-status display |
-| **MicroSD Card Module** | CSV logging for trips, waypoints, environmental data, and events |
+| **NEO-M8N GPS Module** | Latitude, longitude, GPS altitude, speed, UTC time, course, satellite data |
+| **2.4 inch SPI TFT Display** | Main UI, home menu, path tracking, GPS, environment, logging, movement, and status screens |
+| **0.96 inch I2C OLED Display #1** | Always-on compass/navigation display |
+| **0.96 inch I2C OLED Display #2** | Always-on GPS status display with satellite animation |
+| **MicroSD Card Module** | CSV logging for trips, waypoints, events, and status |
 | **BME280 Sensor** | Temperature, humidity, pressure, and pressure-altitude estimate |
 | **BMM150 Magnetometer** | Compass heading and navigation direction support |
-| **MPU-6050** | Pitch, roll, motion detection, shake/impact detection |
-| **3 Push Buttons** | Mode/menu, up, and down navigation |
-| **Active Buzzer** | Alerts for waypoint save, arrival, GPS fix, SD error, and low battery |
+| **MPU-6050** | Pitch, roll, acceleration, gyro, and movement/orientation data |
+| **NULLLAB I2C Numberpad/Keypad** | Menu navigation, waypoint actions, and latitude/longitude input |
+| **Active Buzzer** | Alerts and feedback foundation |
 | **Power Circuit** | Portable battery-powered operation |
-
-![Alt text](https://github.com/VictorGranado/GeoTracker-v1.0/blob/92e80e2c3bc338a8f77a025eeff407417906f5b6/Wiring%20Diagram)
 
 ---
 
 ## Display Roles
 
-GeoTracker uses one main display and two support displays.
+GeoTracker uses a three-display layout:
 
-| Display | Role |
+| Display | Final Role |
 |---|---|
-| **2.4 inch SPI TFT** | Main UI, GPS dashboard, live map, trip screen, navigation screen |
-| **OLED #1** | Compass heading, pitch, roll, tilt warnings |
-| **OLED #2** | GPS fix, satellite count, HDOP, logging status |
+| **2.4 inch SPI TFT** | Main user interface with home screen, side menu, path tracking, environment, logging, movement, and status pages |
+| **OLED #1** | Always-on compass/navigation display with live heading animation and degree readout |
+| **OLED #2** | Always-on GPS status display with lock state, satellite count, HDOP, UTC time, and satellite-orbit animation |
 
-This gives the project a multi-panel field-instrument layout. The TFT handles larger visual information, while the OLEDs provide always-visible status data.
+This layout makes the device feel more like a dedicated field instrument:
+
+- The TFT handles interaction and deeper data views.
+- OLED #1 always answers: **What direction am I facing?**
+- OLED #2 always answers: **Is GPS healthy?**
+
+---
+
+## Final UI Structure
+
+The main TFT interface is organized around a home screen and side menu.
+
+```text
+HOME
+├── Path Tracking
+│   ├── Live GPS
+│   ├── Start / Stop Tracking
+│   ├── Navigate To Coordinates
+│   ├── Navigate to Waypoint
+│   └── Return to Start
+│
+├── Environment
+│   └── BME280 readings
+│
+├── Logging
+│   ├── LOG.CSV
+│   ├── WAYPTS.CSV
+│   ├── EVENTS.CSV
+│   ├── Distance
+│   ├── Elevation gain/loss
+│   └── Duration
+│
+├── Movement
+│   ├── Pitch / Roll
+│   ├── Acceleration magnitude
+│   ├── Heading
+│   ├── Magnetic field strength
+│   └── Gyroscope data
+│
+└── Status
+    ├── TFT status
+    ├── OLED status
+    ├── GPS serial status
+    ├── Sensor status
+    ├── SD status
+    └── Keypad status
+```
+
+---
+
+## Keypad Controls
+
+GeoTracker uses the I2C keypad as the primary control system.
+
+### Normal/Menu Mode
+
+| Key | Action |
+|---|---|
+| **A** | Next item / next screen |
+| **B** | Previous item / back |
+| **C** | Enter / select / start-stop tracking depending on screen |
+| **D** | Save current waypoint |
+| **\*** | Jump to logging screen / decimal point in input mode |
+| **#** | Home/menu shortcut / negative sign in input mode |
+
+### Coordinate Input Mode
+
+| Key | Action |
+|---|---|
+| **0–9** | Number input |
+| **\*** | Decimal point |
+| **#** | Negative sign |
+| **A** | Confirm field / next field |
+| **B** | Cancel / back |
+| **C** | Confirm / save |
+| **D** | Delete / backspace |
+
+Example coordinate entry:
+
+```text
+Latitude:   43.826450
+Longitude: -111.789120
+
+Keypad input:
+LAT: 43*826450
+LON: #111*789120
+```
 
 ---
 
 ## Main Operating Modes
 
-### 1. GPS Dashboard
+### 1. Home
 
-Displays live GPS information.
+The home screen provides a quick overview:
 
-Shown values:
+- GPS fix state
+- Satellite count
+- Latitude and longitude
+- Heading
+- Temperature
+- Tracking duration
+- Distance traveled
+- Side menu access
 
-- GPS fix status
+---
+
+### 2. Path Tracking
+
+This is the main mission area of the device.
+
+Path Tracking includes:
+
+- Live GPS
+- Start/stop tracking
+- Navigate to manual coordinates
+- Navigate to saved waypoint ID
+- Return to start
+
+When tracking starts, GeoTracker stores the starting GPS coordinate and begins logging the full sensor/GPS state to CSV.
+
+---
+
+### 3. Live GPS
+
+Displays:
+
+- Fix type
 - Satellite count
 - Latitude
 - Longitude
 - GPS altitude
 - Speed
-- Course over ground
-- GPS time/date
-
-Example display concept:
-
-```text
-GeoTracker GPS
-Fix: 3D   Sat: 12
-Lat: 43.826100
-Lon:-111.789700
-Alt: 1486m Spd:1.2m/s
-```
+- HDOP
+- UTC time/date through the header/status displays
 
 ---
 
-### 2. Live Track Map
+### 4. Waypoint Marker
 
-Draws a simple live GPS trail on the TFT display.
+The user can save the current GPS position as a waypoint.
 
-This is not a full street map. Instead, it plots the path using GPS coordinates converted into screen positions.
+Saved waypoint data includes:
 
-Shown elements:
-
-- Current position
-- Start point
-- Path history
-- Waypoint markers
-- Target direction line
-- Distance traveled
-- Scale indicator
-
-Example concept:
-
-```text
-+--------------------------+
-| GeoTracker MAP   Fix: 3D   |
-|                          |
-|      WPT2                |
-|       *                  |
-|        \                 |
-| START *--\-----> YOU     |
-|                          |
-| Dist: 0.84 km            |
-+--------------------------+
-```
+- Waypoint ID
+- Timestamp
+- Name/source
+- Latitude
+- Longitude
+- GPS altitude
+- Heading
+- Temperature
+- Humidity
+- Pressure
+- Notes
 
 ---
 
-### 3. Waypoint Marker
+### 5. Navigation
 
-Allows the user to save the current GPS position as a waypoint.
-
-Possible waypoint types:
-
-- Start
-- Sample point
-- Observation point
-- Hazard point
-- Target point
-- Custom point
-
-Example:
-
-```text
-WAYPOINT SAVED
-ID: WPT_004
-Lat: 43.826100
-Lon:-111.789700
-```
-
----
-
-### 4. Waypoint Navigation
-
-Guides the user toward a selected waypoint or manually entered target coordinate.
-
-Displayed values:
+GeoTracker can guide the user toward a manually entered coordinate or saved waypoint using:
 
 - Distance to target
 - Bearing to target
 - Current compass heading
-- Turn direction
-- Arrival status
+- Turn left/right guidance
+- Target name/source
 
-Example:
-
-```text
-NAV TO TARGET
-Dist: 248 m
-Bearing: 126 deg
-Heading: 101 deg
-Turn: RIGHT 25 deg
-```
-
-This mode works like a field GPS compass rather than road navigation. It gives direction and distance, but it does not know roads, sidewalks, buildings, fences, or obstacles.
+This works like a field GPS compass, not road navigation. It gives direction and distance, but it does not know roads, sidewalks, buildings, fences, or obstacles.
 
 ---
 
-### 5. Return to Start
+### 6. Return to Start
 
-When a trip begins, GeoTracker stores the starting GPS coordinate.
+When a tracking session begins, GeoTracker saves the starting point. Return-to-start mode uses that stored point as the navigation target.
 
-Return-to-start mode guides the user back to the starting point using:
+Displayed values can include:
 
 - Distance to start
 - Bearing to start
 - Current heading
 - Turn left/right guidance
-- Arrival alert
-
-This is one of the most practical field features of the device.
+- Arrival state foundation
 
 ---
 
-### 6. Trip Recorder
+### 7. Environment
 
-Tracks and logs movement over time.
+The Environment page displays BME280 data:
 
-Trip values:
-
-- Total distance traveled
-- Current speed
-- Average speed
-- Maximum speed
-- Moving time
-- Stopped time
-- GPS altitude
-- Estimated altitude gain/loss
-- Waypoint count
-
-Example:
-
-```text
-TRIP RECORDER
-Dist: 1.42 km
-Speed: 1.1 m/s
-Alt: 1486 m
-WPT: 004
-```
-
----
-
-### 7. Environmental Survey
-
-Combines GPS data with BME280 readings.
-
-Logged values:
-
-- Latitude
-- Longitude
-- GPS altitude
 - Temperature
 - Humidity
-- Pressure
-- Pressure altitude
-- Timestamp
+- Barometric pressure
+- Pressure altitude estimate
+- BME280 detected I2C address
 
-This makes environmental data map-ready because every reading is tied to a specific location.
+This makes environmental data map-ready because each reading can be logged together with GPS position.
 
 ---
 
-### 8. Compass and Tilt Display
+### 8. Movement
 
-OLED #1 provides a quick directional/orientation panel.
+The Movement page combines MPU-6050 and BMM150 data:
 
-Data sources:
+- Pitch
+- Roll
+- Acceleration magnitude
+- Heading
+- Cardinal direction
+- Magnetic field strength
+- Gyroscope data
 
-- BMM150 magnetometer for heading
-- MPU-6050 for pitch and roll
+The BMM150 provides magnetic heading. The MPU-6050 provides orientation and movement data, but it does not replace the magnetometer because it does not detect magnetic north.
 
-Example:
+---
+
+### 9. Logging
+
+The Logging page shows file and trip information:
+
+- SD card status
+- Tracking state
+- LOG.CSV size
+- WAYPTS.CSV size
+- EVENTS.CSV size
+- Logged row count
+- Distance traveled
+- Elevation gain/loss
+- Tracking duration
+
+---
+
+### 10. Device Status
+
+The Status page shows system health:
+
+- TFT
+- OLED #1
+- OLED #2
+- BME280
+- MPU6050
+- BMM150
+- SD
+- GPS UART
+- Keypad
+- GPS lock
+- I2C/SPI/UART pin summary
+- GPS character count
+
+---
+
+## SD Card Output
+
+GeoTracker writes to the `/GEOTRK` folder on the MicroSD card.
 
 ```text
-COMPASS
-Head: 274 deg
-Pitch: -4 deg
-Roll: 12 deg
+/GEOTRK/LOG.CSV
+/GEOTRK/WAYPTS.CSV
+/GEOTRK/EVENTS.CSV
+/GEOTRK/STATUS.TXT
 ```
 
-Potential warnings:
+### LOG.CSV
 
-- Hold device level
-- Magnetic interference detected
-- Motion too unstable for accurate heading
+Main tracking log. Stores GPS, environmental, motion, compass, navigation, keypad, and UI state data.
+
+Example categories:
+
+- Row number
+- Millis timestamp
+- Date/time UTC
+- Tracking state
+- Elapsed time
+- Distance
+- Elevation gain/loss
+- Target state/source/name
+- Target distance/bearing/turn direction
+- GPS fix, latitude, longitude, altitude, speed, course, satellites, HDOP
+- BME280 temperature, humidity, pressure, pressure altitude
+- MPU-6050 pitch, roll, acceleration, gyro
+- BMM150 heading and magnetic field strength
+- Last key pressed
+- Current screen/page
+
+### WAYPTS.CSV
+
+Stores saved waypoints and tracking start points.
+
+Example fields:
+
+```csv
+id,millis,date_utc,time_utc,name,source,lat,lon,alt_m,heading_deg,temp_c,humidity_percent,pressure_hpa,note
+```
+
+### EVENTS.CSV
+
+Stores device and UI events.
+
+Example events:
+
+- BOOT
+- TRACK_START
+- TRACK_STOP
+- WAYPOINT
+- NAV_TARGET
+- RETURN_START
+- SELECT
+
+### STATUS.TXT
+
+Stores boot-time subsystem status and interface/pin information.
 
 ---
 
-### 9. Satellite Status Display
+## Final Pin Mapping
 
-OLED #2 provides GPS status.
+### TFT Display — SPI
 
-Example:
+| TFT Pin | ESP32 Pin |
+|---|---|
+| DIN / MOSI | GPIO23 |
+| CLK / SCK | GPIO18 |
+| MISO | GPIO19 shared with SD, if available |
+| CS | GPIO5 |
+| DC | GPIO2 |
+| RST | GPIO4 |
+| BL | 3.3 V / always on |
 
-```text
-GPS STATUS
-Fix: 3D
-Sat: 12
-HDOP: 0.9
-Log: ON
-```
+### MicroSD — SPI
 
-This allows the main TFT screen to remain focused on the active mode while GPS status remains visible.
+| SD Pin | ESP32 Pin |
+|---|---|
+| VCC | 5 V |
+| GND | GND |
+| SCK | GPIO18 |
+| MOSI / DI | GPIO23 |
+| MISO / DO | GPIO19 |
+| CS | GPIO13 |
 
----
+The SD module used in this build worked reliably from 5 V input.
 
-## Button Controls
+### GPS — UART2
 
-GeoTracker uses three push buttons.
+| GPS Pin | ESP32 Pin |
+|---|---|
+| GPS TX | GPIO16 / ESP32 RX2 |
+| GPS RX | GPIO17 / ESP32 TX2 |
+| Baud | 9600 |
 
-| Button | Short Press | Long Press |
-|---|---|---|
-| **MODE / MENU** | Change mode | Open or close menu |
-| **UP** | Scroll up / zoom in | Save waypoint |
-| **DOWN** | Scroll down / zoom out | Start or stop logging |
+### Main I2C Bus
 
-This layout keeps the hardware simple while still supporting menus, navigation, waypoint marking, and logging.
+| Signal | ESP32 Pin |
+|---|---|
+| SDA | GPIO21 |
+| SCL | GPIO22 |
+
+Devices on main I2C:
+
+- OLED #1 at `0x3C`
+- BME280 at `0x76` or `0x77`
+- MPU-6050 at `0x68` or `0x69`
+- BMM150 at `0x13`
+- NULLLAB keypad at approximately `0x65`
+
+### Second I2C Bus
+
+| Signal | ESP32 Pin |
+|---|---|
+| SDA | GPIO32 |
+| SCL | GPIO33 |
+
+Device on second I2C:
+
+- OLED #2 at `0x3C`
+
+Using two ESP32 I2C buses allowed both OLEDs to use the same `0x3C` address without needing an I2C multiplexer.
 
 ---
 
@@ -337,9 +518,10 @@ Used for:
 - GPS altitude
 - GPS speed
 - GPS course while moving
-- GPS time/date
+- UTC time/date
 - Satellite count
 - Fix status
+- HDOP
 
 ---
 
@@ -374,6 +556,7 @@ Used for:
 - Stationary direction sensing
 - Bearing comparison
 - Navigation arrow support
+- Magnetic field strength reading
 
 The magnetometer is important because GPS course is only reliable while moving. The BMM150 allows the device to estimate direction even when standing still.
 
@@ -385,13 +568,12 @@ Used for:
 
 - Pitch
 - Roll
-- Motion detection
-- Shake detection
-- Impact/shock events
-- Orientation assist
-- Hold-level warning
+- Acceleration
+- Gyroscope data
+- Movement/orientation display
+- Future hold-level warnings or motion detection
 
-The MPU-6050 does not replace the magnetometer because it does not detect magnetic north. It works together with the BMM150 to improve the handheld navigation experience.
+The MPU-6050 does not detect magnetic north. It works together with the BMM150 to improve the handheld navigation experience.
 
 ---
 
@@ -399,7 +581,7 @@ The MPU-6050 does not replace the magnetometer because it does not detect magnet
 
 ### Distance to Target
 
-For accurate GPS distance calculations, GeoTracker can use the Haversine formula.
+GeoTracker uses a Haversine-style distance calculation.
 
 ```cpp
 double distanceMeters(double lat1, double lon1, double lat2, double lon2) {
@@ -419,8 +601,6 @@ double distanceMeters(double lat1, double lon1, double lat2, double lon2) {
   return R * c;
 }
 ```
-
----
 
 ### Bearing to Target
 
@@ -443,8 +623,6 @@ double bearingDegrees(double lat1, double lon1, double lat2, double lon2) {
 }
 ```
 
----
-
 ### Turn Direction
 
 ```cpp
@@ -461,300 +639,163 @@ double turnAngle(double targetBearing, double currentHeading) {
 Interpretation:
 
 ```text
-diff > 0  -> turn right
-diff < 0  -> turn left
-diff near 0 -> go straight
+diff > 0       -> turn right
+diff < 0       -> turn left
+diff near 0    -> go straight
 ```
 
 ---
 
-## Live Map Concept
+## GeoTracker Studio Companion Software
 
-The TFT live map converts GPS position changes into screen coordinates.
-
-Basic idea:
+GeoTracker Studio is the companion software layer for GeoTracker v1.0. The embedded device collects the field data, and GeoTracker Studio turns that data into readable maps, graphs, summaries, and exports.
 
 ```text
-latitude/longitude -> meters north/east -> TFT x/y pixels
+GeoTracker v1.0
+Handheld ESP32 field-data collector
+        ↓
+MicroSD CSV files
+        ↓
+GeoTracker Studio
+Python desktop visualization and analysis tool
 ```
 
-Approximate local conversion:
+This separation keeps the ESP32 firmware focused on reliable field operation while the desktop software handles heavier visualization, analysis, and export work.
 
-```cpp
-float north_m = (currentLat - startLat) * 111320.0;
-float east_m  = (currentLon - startLon) * 111320.0 * cos(radians(startLat));
+### Companion Role
 
-int x = centerX + east_m / metersPerPixel;
-int y = centerY - north_m / metersPerPixel;
-```
-
-Then the display draws the path:
-
-```cpp
-tft.drawLine(oldX, oldY, x, y, pathColor);
-tft.fillCircle(x, y, 3, currentPositionColor);
-```
-
-The first version should use a simple trail map instead of full offline street maps.
-
----
-
-## Data Logging
-
-GeoTracker logs data to a MicroSD card using CSV files. CSV is easy to open in Excel, Google Sheets, Python, MATLAB, or mapping tools.
-
-### Main Trip Log
-
-Suggested filename:
+GeoTracker Studio is designed to import GeoTracker SD card files such as:
 
 ```text
-TRIP_001.csv
+LOG.CSV
+WAYPTS.CSV
+EVENTS.CSV
+STATUS.TXT
 ```
 
-Suggested columns:
+Once imported, the software can reconstruct a session using GPS position, altitude, speed, heading, environmental readings, motion/orientation values, waypoints, and event markers.
 
-```csv
-timestamp,lat,lon,gps_alt_m,speed_mps,course_deg,satellites,fix,temp_c,humidity_pct,pressure_hpa,pressure_alt_m,heading_deg,pitch_deg,roll_deg
-```
+### Visualization Levels
 
-Example:
+GeoTracker Studio follows a layered visualization model:
 
-```csv
-2026-05-10 14:32:10,43.826100,-111.789700,1486.2,1.2,274,12,3D,21.4,38.0,846.3,1480.8,271.5,-4.0,12.0
-```
+| Level | View | Purpose |
+|---|---|---|
+| **Level 1** | CSV/session summary | Quickly verify imported data and trip statistics |
+| **Level 2** | Simple 2D route plot | Show the path, start/end points, waypoints, and events |
+| **Level 3** | Interactive 2D map | Display route data over a map-style view using Folium/OpenStreetMap |
+| **Level 4** | Interactive 3D route | Show route shape using local X/Y meters and altitude as Z |
+| **Level 5** | Sensor overlays | Color or filter the path by speed, altitude, temperature, humidity, pressure, heading, GPS quality, or motion data |
+| **Level 6** | Export layer | Generate KML/GPX/GeoJSON for Google Earth, Google My Maps, or other mapping tools |
+| **Level 7** | Advanced Google mapping | Optional Google Maps API, Google Map Tiles, or Photorealistic 3D Tiles integration |
 
----
+### Data Relationship
 
-### Waypoint Log
-
-Suggested filename:
+GeoTracker Studio depends on GeoTracker v1.0's core logging idea:
 
 ```text
-WAYPOINTS.csv
+position + time + sensor values + movement/orientation + event context
 ```
 
-Suggested columns:
+That means every logged field point can later be visualized as a spatial data sample instead of just a row of numbers.
 
-```csv
-waypoint_id,timestamp,type,lat,lon,gps_alt_m,note
-```
+### Current Companion Direction
 
-Example:
-
-```csv
-WPT_004,2026-05-10 14:41:22,SAMPLE,43.826100,-111.789700,1486.2,Field sample point
-```
-
----
-
-### System Log
-
-Suggested filename:
+GeoTracker Studio should be presented as a ready complementary project to GeoTracker v1.0. In documentation, portfolio descriptions, and project explanations, the pair can be described as:
 
 ```text
-SYSTEM.csv
+GeoTracker v1.0 is the embedded field-data acquisition device.
+GeoTracker Studio is the Python visualization companion that imports and analyzes the captured data.
 ```
 
-Suggested columns:
+### Expansion Path
 
-```csv
-timestamp,battery_v,gps_fix,satellites,sd_status,mode,event
-```
+Future improvements to GeoTracker Studio can include:
 
-Example:
-
-```csv
-2026-05-10 14:32:10,4.05,3D,12,OK,GPS_DASHBOARD,LOGGING_STARTED
-```
+- Session-based imports
+- KML export
+- GPX export
+- GeoJSON export
+- Interactive sensor overlays
+- Synchronized route/sample selection
+- 3D terrain or altitude views
+- Google Earth / Google My Maps compatibility
+- Optional Google Maps JavaScript API integration
+- Optional Google Map Tiles / Photorealistic 3D Tiles advanced viewer
 
 ---
 
 ## Suggested Software Libraries
 
-Possible Arduino IDE libraries:
+Arduino IDE libraries used or planned:
 
-| Function | Suggested Library |
+| Function | Library |
 |---|---|
 | GPS parsing | `TinyGPSPlus` |
-| TFT display | `TFT_eSPI` or `Adafruit_ILI9341` |
+| TFT display | `Adafruit_ILI9341` and `Adafruit_GFX` |
 | OLED displays | `Adafruit_SSD1306` and `Adafruit_GFX` |
-| MicroSD card | `SD` or `SdFat` |
+| MicroSD card | `SD` |
 | BME280 | `Adafruit_BME280` |
-| BMM150 | `DFRobot_BMM150` or compatible BMM150 library |
 | MPU-6050 | `Adafruit_MPU6050` |
+| BMM150 | `DFRobot_BMM150` |
 | I2C communication | `Wire` |
 | SPI communication | `SPI` |
 
----
+GeoTracker Studio Python libraries:
 
-## Proposed Pin Mapping
-
-> Final pin mapping may change depending on the exact TFT, SD module, GPS breakout, and available ESP32-WROOM-DA dev board pins.
-
-| Component | Interface | Suggested ESP32 Pins |
-|---|---|---|
-| TFT Display SCK | SPI | GPIO18 |
-| TFT Display MOSI | SPI | GPIO23 |
-| TFT Display MISO | SPI | GPIO19, if needed |
-| TFT Display CS | SPI | GPIO5 |
-| TFT Display DC | GPIO | GPIO2 |
-| TFT Display RST | GPIO | GPIO4 |
-| MicroSD SCK | SPI shared | GPIO18 |
-| MicroSD MOSI | SPI shared | GPIO23 |
-| MicroSD MISO | SPI shared | GPIO19 |
-| MicroSD CS | SPI | GPIO13 |
-| GPS TX to ESP32 RX | UART | GPIO16 |
-| GPS RX to ESP32 TX | UART | GPIO17 |
-| I2C SDA | I2C | GPIO21 |
-| I2C SCL | I2C | GPIO22 |
-| Button MODE | GPIO input | GPIO25 |
-| Button UP | GPIO input | GPIO26 |
-| Button DOWN | GPIO input | GPIO27 |
-| Active Buzzer | GPIO output | GPIO14 |
-| Battery Monitor | ADC | GPIO32 |
-
----
-
-## I2C Devices
-
-The following modules share the I2C bus:
-
-- OLED #1
-- OLED #2
-- BME280
-- BMM150
-- MPU-6050
-
-Important note: two identical OLED displays often use the same default I2C address, commonly `0x3C`. If both OLEDs have the same address and cannot be changed, an I2C multiplexer such as the **TCA9548A** may be required.
-
-Possible I2C address examples:
-
-| Device | Common Address |
+| Function | Library |
 |---|---|
-| OLED SSD1306 | `0x3C` or `0x3D` |
-| BME280 | `0x76` or `0x77` |
-| BMM150 | often `0x10` to `0x13`, depending on breakout/library |
-| MPU-6050 | `0x68` or `0x69` |
-| TCA9548A I2C Multiplexer | `0x70` |
+| CSV/data analysis | `pandas` |
+| Simple 2D plots | `matplotlib` |
+| Interactive 2D/3D plots | `plotly` |
+| Interactive web maps | `folium` |
+| KML/GPX export | `simplekml`, `gpxpy`, or custom exporters |
+| GUI/dashboard | `PySide6`, `Tkinter`, or `Streamlit` |
 
 ---
 
-## Power Notes
+## Testing and Validation
 
-GeoTracker is designed to be portable, so power stability is important.
+Completed validation includes:
 
-Recommended power considerations:
+- Individual TFT test
+- Dual OLED test using two I2C buses
+- BME280 test
+- MPU-6050 test
+- BMM150 test using DFRobot library
+- NEO-M8N GPS test
+- MicroSD read/write test
+- I2C keypad test
+- Full system integration test
+- Final wiring and assembled build
+- SD output verification
+- Waypoint CSV verification
+- Event CSV verification
+- Status text verification
 
-- Use a stable 3.3 V supply for ESP32 and sensors.
-- Verify whether the GPS, TFT, OLEDs, and SD module require 3.3 V or 5 V input.
-- Use common ground for all modules.
-- Add decoupling capacitors near display, GPS, and SD module power pins.
-- Avoid powering high-current displays directly from weak regulator outputs.
-- Monitor battery voltage through a voltage divider connected to an ESP32 ADC pin.
-- Add low-battery warning through the buzzer and display.
-
----
-
-## Development Plan
-
-### Phase 1 — Core Bring-Up
-
-- Test ESP32 board
-- Test TFT display
-- Test OLED #1
-- Test OLED #2
-- Test button input
-- Test buzzer output
+Final integration confirmed that all major peripherals can run together on the ESP32-WROOM-DA.
 
 ---
 
-### Phase 2 — GPS System
+## Known Notes and Limitations
 
-- Read GPS data from NEO-M8N
-- Display latitude and longitude
-- Display satellite count and fix status
-- Display GPS speed and altitude
-- Show GPS time/date
-
----
-
-### Phase 3 — Sensors
-
-- Read BME280 temperature, humidity, and pressure
-- Calculate pressure altitude
-- Read BMM150 compass heading
-- Read MPU-6050 pitch and roll
-- Display compass and tilt on OLED #1
-- Display GPS status on OLED #2
-
----
-
-### Phase 4 — SD Logging
-
-- Initialize MicroSD card
-- Create trip CSV file
-- Log GPS and sensor readings
-- Create waypoint CSV file
-- Create system event log
-
----
-
-### Phase 5 — Navigation
-
-- Save start position
-- Save waypoint
-- Calculate distance to waypoint
-- Calculate bearing to waypoint
-- Compare bearing with heading
-- Display turn left/right guidance
-- Trigger arrival buzzer alert
-
----
-
-### Phase 6 — Live Track Map
-
-- Convert GPS coordinates to local x/y map points
-- Draw current position
-- Draw path history
-- Draw start point
-- Draw waypoint markers
-- Add zoom or scaling behavior
-
----
-
-### Phase 7 — Polish
-
-- Improve menu UI
-- Add icons and status indicators
-- Add startup animation
-- Add error screens
-- Add low battery warning
-- Add enclosure and wiring cleanup
-- Create final documentation and screenshots
-
----
-
-## Expected Challenges
-
-- Getting reliable GPS fix indoors may be difficult.
-- Magnetometer calibration is required for accurate heading.
-- The BMM150 may be affected by nearby metal, batteries, wires, speakers, and magnets.
-- Two OLED displays may conflict if they share the same I2C address.
-- SD card writing can fail if power is unstable.
-- TFT and SD card sharing SPI requires careful chip-select handling.
-- GPS altitude may be noisy compared with pressure altitude.
-- MPU-6050 orientation can drift if used incorrectly.
-- Outdoor testing is needed to validate navigation and mapping features.
+- GPS fix may be weak or unavailable indoors.
+- Magnetometer accuracy depends on calibration and final mounting location.
+- Nearby batteries, wires, speakers, magnets, or metal parts can affect the BMM150.
+- GPS altitude can be noisy compared with pressure altitude.
+- TFT and SD share the SPI bus, so chip-select handling must remain clean.
+- The TFT refresh was improved in the smoother UI build, but future versions could use more advanced dirty-rectangle updates.
+- Current navigation gives bearing/distance guidance, not road-aware routing.
+- Google Maps / 3D Tiles integration belongs to GeoTracker Studio, not the embedded ESP32 device itself. The ESP32 records location-tagged field data; the companion software handles advanced map rendering.
 
 ---
 
 ## Future Improvements
 
-Possible GeoTracker v1.1 or v2.0 upgrades:
+Possible GeoTracker v1.1/v2.0 upgrades:
 
-- GPX export
-- KML export for Google Earth
-- GeoJSON export
+- Session-based SD folders
+- Cleaner trip/session naming
 - Larger TFT display
 - Offline map tile support
 - LoRa beacon mode
@@ -763,13 +804,14 @@ Possible GeoTracker v1.1 or v2.0 upgrades:
 - Light intensity mapping
 - Battery percentage estimation
 - Recharge/charging status display
-- Enclosure with weather resistance
+- Weather-resistant enclosure refinement
 - Vibration motor for silent navigation feedback
-- Rotary encoder for easier menu navigation
-- TCA9548A I2C multiplexer for cleaner multi-OLED support
 - Compass calibration wizard
 - Waypoint naming system
 - Route summary screen
+- More advanced path map on TFT
+- Arrival buzzer alerts
+- Improved TFT partial refresh / dirty rectangle rendering
 
 ---
 
@@ -784,27 +826,50 @@ Possible GeoTracker v1.1 or v2.0 upgrades:
 - Log trail distance and movement data
 - Test GPS and compass algorithms
 - Build a handheld field-data collection device
-- Learn embedded navigation, sensor fusion, and data logging
+- Learn embedded navigation, sensor integration, and data logging
+- Import captured SD logs into GeoTracker Studio for 2D/3D visualization and analysis
+
+---
+
+## Repository Structure
+
+Suggested repository organization:
+
+```text
+GeoTracker-v1.0/
+├── firmware/
+│   └── GeoTracker_V1_Release.ino
+│
+├── tests/
+│   ├── GeoTracker_display_test.ino
+│   ├── GeoTracker_GPS_test.ino
+│   ├── GeoTracker_BME280_test.ino
+│   ├── GeoTracker_BMM150_test.ino
+│   ├── GeoTracker_MPU6050_test.ino
+│   ├── GeoTracker_SD_logging_test.ino
+│   └── GeoTracker_numberpad_test.ino
+│
+├── docs/
+│   ├── wiring_diagram.png
+│   ├── final_build_photos/
+│   └── sd_output_examples/
+│
+├── geotracker_studio/
+│   ├── src/
+│   ├── example_data/
+│   ├── exports/
+│   └── README.md
+│
+└── README.md
+```
 
 ---
 
 ## Project Status
 
-Current status: **Planning / hardware scope locked**
+**GeoTracker v1.0 is complete.**
 
-Locked hardware:
-
-- ESP32-WROOM-DA Dev Board
-- NEO-M8N GPS Module
-- 2.4 inch SPI TFT Display
-- Two 0.96 inch I2C OLED Displays
-- MicroSD Card Module
-- BME280 Sensor
-- BMM150 Magnetometer
-- MPU-6050
-- Three Push Buttons
-- Active Buzzer
-- Power Circuit
+The final build is assembled, wired, integrated, and operational. The embedded system successfully combines GPS, environmental sensing, compass heading, motion/orientation data, MicroSD logging, keypad input, and a three-display interface into a single handheld field survey device. GeoTracker Studio should be treated as the ready companion software component that extends the device into a full data visualization and analysis system.
 
 ---
 
